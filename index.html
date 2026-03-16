@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Which Concentrate Is Right for You? | Mood</title>
+
+  <!-- Google Fonts: Playfair Display (headers) + DM Sans (body) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ─────────────────────────────────────────────────────────
+       DESIGN TOKENS — Mood Widget Design System
+    ───────────────────────────────────────────────────────── */
+    :root {
+      --forest:     #1B3A2F;   /* primary forest green */
+      --forest-mid: #2C5445;   /* mid green for accents */
+      --forest-light: #4A7C6B; /* lighter green for tags */
+      --cream:      #F8F6F2;   /* card background */
+      --cream-deep: #EDE9E2;   /* pressed / hover */
+      --white:      #FFFFFF;
+      --ink:        #1A1916;   /* primary text */
+      --ink-mid:    #4A4740;   /* secondary text */
+      --ink-light:  #8A8480;   /* muted / caption */
+      --border:     #DDD9D2;   /* subtle border */
+      --selected-bg:#EBF1EE;   /* selected option bg */
+      --selected-border: #1B3A2F;
+
+      /* Intensity scale (for result badge) */
+      --grade-easy:   #3D8C5C; /* green  — beginner friendly */
+      --grade-mid:    #B8860B; /* gold   — some experience */
+      --grade-adv:    #C86B1A; /* amber  — experienced */
+
+      --radius-card: 20px;
+      --radius-btn:  12px;
+      --radius-chip: 8px;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+
+      --shadow-card: 0 2px 16px rgba(27,58,47,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow-hover: 0 6px 28px rgba(27,58,47,0.14), 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-result: 0 8px 40px rgba(27,58,47,0.16), 0 2px 12px rgba(0,0,0,0.06);
+
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--ink);
+      padding: 24px 16px 40px;
+      min-height: 100vh;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       WIDGET WRAPPER
+    ───────────────────────────────────────────────────────── */
+    .widget {
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       HEADER
+    ───────────────────────────────────────────────────────── */
+    .widget-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .widget-eyebrow {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--forest-light);
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 5px 14px;
+      margin-bottom: 14px;
+    }
+
+    .widget-title {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 5vw, 28px);
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--forest);
+      margin-bottom: 10px;
+    }
+
+    .widget-subtitle {
+      font-size: 14px;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       PROGRESS BAR
+    ───────────────────────────────────────────────────────── */
+    .progress-wrap {
+      margin-bottom: 24px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-light);
+      letter-spacing: 0.04em;
+    }
+
+    .progress-track {
+      height: 4px;
+      background: var(--cream-deep);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--forest);
+      border-radius: 2px;
+      transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       QUESTION CARD
+    ───────────────────────────────────────────────────────── */
+    .question-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 32px 28px 28px;
+      box-shadow: var(--shadow-card);
+      animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-number {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--forest-light);
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-family: var(--font-display);
+      font-size: clamp(17px, 4vw, 20px);
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-bottom: 22px;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       OPTION BUTTONS
+    ───────────────────────────────────────────────────────── */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      width: 100%;
+      padding: 16px 18px;
+      background: var(--cream);
+      border: 1.5px solid transparent;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      text-align: left;
+      transition:
+        background var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        transform 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-btn:hover {
+      background: var(--cream-deep);
+      border-color: var(--border);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .option-btn:active {
+      transform: translateY(0);
+    }
+
+    .option-btn.selected {
+      background: var(--selected-bg);
+      border-color: var(--selected-border);
+      box-shadow: 0 0 0 3px rgba(27,58,47,0.1);
+    }
+
+    /* Radio circle */
+    .option-radio {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .option-btn.selected .option-radio {
+      border-color: var(--forest);
+      background: var(--forest);
+    }
+
+    .option-radio-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--white);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .option-btn.selected .option-radio-dot {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Option text */
+    .option-content {}
+
+    .option-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+
+    .option-detail {
+      font-size: 12.5px;
+      color: var(--ink-mid);
+      line-height: 1.45;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       NAVIGATION BUTTONS
+    ───────────────────────────────────────────────────────── */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      gap: 12px;
+    }
+
+    .btn-back {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-mid);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--transition);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .btn-back.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn-back:hover {
+      color: var(--forest);
+    }
+
+    .btn-next {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--forest);
+      border: none;
+      border-radius: var(--radius-btn);
+      padding: 13px 28px;
+      cursor: pointer;
+      transition:
+        background var(--transition),
+        box-shadow var(--transition),
+        transform 0.15s ease,
+        opacity var(--transition);
+      opacity: 0.4;
+      pointer-events: none;
+      margin-left: auto;
+    }
+
+    .btn-next.enabled {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn-next.enabled:hover {
+      background: var(--forest-mid);
+      box-shadow: 0 4px 16px rgba(27,58,47,0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-next.enabled:active {
+      transform: translateY(0);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       RESULT CARD
+    ───────────────────────────────────────────────────────── */
+    .result-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-result);
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .result-header {
+      background: var(--forest);
+      padding: 28px 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative texture on result header */
+    .result-header::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+
+    .result-header::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+
+    .result-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 8px;
+    }
+
+    .result-format-name {
+      font-family: var(--font-display);
+      font-size: clamp(24px, 6vw, 30px);
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .result-tagline {
+      font-size: 14px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.55;
+      position: relative;
+    }
+
+    /* Experience level badge */
+    .result-body {
+      padding: 24px 28px 28px;
+    }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 6px 12px;
+      border-radius: 40px;
+      margin-bottom: 20px;
+    }
+
+    .result-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* badge variants */
+    .badge-easy   { color: var(--grade-easy);  background: rgba(61,140,92,0.1);  border: 1px solid rgba(61,140,92,0.25); }
+    .badge-easy   .result-badge-dot { background: var(--grade-easy); }
+    .badge-mid    { color: var(--grade-mid);   background: rgba(184,134,11,0.1); border: 1px solid rgba(184,134,11,0.25); }
+    .badge-mid    .result-badge-dot { background: var(--grade-mid); }
+    .badge-adv    { color: var(--grade-adv);   background: rgba(200,107,26,0.1); border: 1px solid rgba(200,107,26,0.25); }
+    .badge-adv    .result-badge-dot { background: var(--grade-adv); }
+
+    /* Why it works section */
+    .result-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 8px;
+    }
+
+    .result-why {
+      font-size: 14.5px;
+      color: var(--ink-mid);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* Traits chips */
+    .traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .trait-chip {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--forest);
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-chip);
+      padding: 5px 11px;
+    }
+
+    /* CTA section */
+    .result-cta {
+      background: var(--cream);
+      border-radius: var(--radius-btn);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .result-cta-text {
+      font-size: 13.5px;
+      color: var(--ink-mid);
+      line-height: 1.4;
+    }
+
+    .result-cta-text strong {
+      display: block;
+      font-size: 14px;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .result-cta-btn {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--forest);
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      white-space: nowrap;
+      transition: background var(--transition), box-shadow var(--transition), transform 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .result-cta-btn:hover {
+      background: var(--forest-mid);
+      box-shadow: 0 4px 14px rgba(27,58,47,0.28);
+      transform: translateY(-1px);
+    }
+
+    /* Restart */
+    .btn-restart {
+      display: block;
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-mid);
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-btn);
+      padding: 12px;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .btn-restart:hover {
+      color: var(--forest);
+      border-color: var(--forest);
+      background: var(--cream);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       HIDDEN / VISIBLE STATES
+    ───────────────────────────────────────────────────────── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ─────────────────────────────────────────────────────────
+       FOOTER BRAND MARK
+    ───────────────────────────────────────────────────────── */
+    .widget-foot {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .widget-foot a {
+      font-size: 11.5px;
+      color: var(--ink-light);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color var(--transition);
+    }
+
+    .widget-foot a:hover {
+      color: var(--forest);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       MOBILE BREAKPOINT (420px)
+    ───────────────────────────────────────────────────────── */
+    @media (max-width: 420px) {
+      body {
+        padding: 16px 12px 32px;
+      }
+
+      .question-card {
+        padding: 24px 18px 20px;
+      }
+
+      .option-btn {
+        padding: 14px 14px;
+      }
+
+      .option-label {
+        font-size: 14px;
+      }
+
+      .result-header {
+        padding: 22px 20px 20px;
+      }
+
+      .result-body {
+        padding: 20px 20px 22px;
+      }
+
+      .result-cta {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .result-cta-btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="widget" id="widget">
+
+  <!-- ─── HEADER ─────────────────────────────────────── -->
+  <div class="widget-header">
+    <span class="widget-eyebrow">Concentrate Finder</span>
+    <h1 class="widget-title">Which Concentrate Format<br>Is Right for You?</h1>
+    <p class="widget-subtitle">
+      Answer 4 quick questions and find your ideal format — from whole melt hash to THCa disposable vapes.
+    </p>
+  </div>
+
+  <!-- ─── PROGRESS ───────────────────────────────────── -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-meta">
+      <span class="progress-label" id="progressLabel">Question 1 of 4</span>
+      <span class="progress-label" id="progressPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCREEN 0 — Q1: Do you have a dab rig?
+  ═══════════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-0">
+    <div class="question-card">
+      <div class="question-number">Question 1 of 4</div>
+      <h2 class="question-text">Do you have a dab rig, or would you prefer something portable?</h2>
+      <div class="options" data-q="0">
+        <button class="option-btn" data-value="rig">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">I have (or want) a dab rig</div>
+            <div class="option-detail">Comfortable with a nail, torch, or electronic rig setup</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="portable">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">I want something portable — no rig</div>
+            <div class="option-detail">Draw-and-go format I can use anywhere</div>
+          </div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" id="back-0">← Back</button>
+        <button class="btn-next" id="next-0">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCREEN 1 — Q2: Solventless priority?
+  ═══════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-1">
+    <div class="question-card">
+      <div class="question-number">Question 2 of 4</div>
+      <h2 class="question-text">How important is solventless purity to you?</h2>
+      <div class="options" data-q="1">
+        <button class="option-btn" data-value="top">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Top priority — I want zero solvents</div>
+            <div class="option-detail">No butane, CO2, or chemical processes involved</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="nice">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Nice to have, but not essential</div>
+            <div class="option-detail">Open to solvent-based if quality and testing check out</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="open">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Not a deciding factor for me</div>
+            <div class="option-detail">I care more about flavor and overall experience</div>
+          </div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back visible" id="back-1">← Back</button>
+        <button class="btn-next" id="next-1">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCREEN 2 — Q3: What matters most?
+  ═══════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-2">
+    <div class="question-card">
+      <div class="question-number">Question 3 of 4</div>
+      <h2 class="question-text">What matters most to you in a concentrate experience?</h2>
+      <div class="options" data-q="2">
+        <button class="option-btn" data-value="terpenes">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Maximum terpene complexity and flavor</div>
+            <div class="option-detail">I want strain-specific aroma and the most nuanced profile possible</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="convenience">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Convenience and ease of use</div>
+            <div class="option-detail">Ready to use, no setup or maintenance required</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="both">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">A balance of both</div>
+            <div class="option-detail">Good flavor with a reasonably simple format</div>
+          </div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back visible" id="back-2">← Back</button>
+        <button class="btn-next" id="next-2">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCREEN 3 — Q4: Experience level?
+  ═══════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-3">
+    <div class="question-card">
+      <div class="question-number">Question 4 of 4</div>
+      <h2 class="question-text">How would you describe your experience with cannabis concentrates?</h2>
+      <div class="options" data-q="3">
+        <button class="option-btn" data-value="new">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">New to concentrates</div>
+            <div class="option-detail">First time exploring beyond flower or edibles</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="some">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Some experience</div>
+            <div class="option-detail">Used vape carts or dabs a few times before</div>
+          </div>
+        </button>
+        <button class="option-btn" data-value="experienced">
+          <div class="option-radio"><div class="option-radio-dot"></div></div>
+          <div class="option-content">
+            <div class="option-label">Experienced dabber</div>
+            <div class="option-detail">Comfortable with rigs, melt scales, and concentrate grades</div>
+          </div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back visible" id="back-3">← Back</button>
+        <button class="btn-next" id="next-3">See my result →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SCREEN 4 — RESULT
+  ═══════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-4">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-eyebrow">Your concentrate match</div>
+        <div class="result-format-name" id="resultName">Whole Melt Hash</div>
+        <div class="result-tagline" id="resultTagline">The purest solventless concentrate — 5–6 star trichome quality with full flavor intact.</div>
+      </div>
+      <div class="result-body">
+        <div class="result-badge" id="resultBadge">
+          <div class="result-badge-dot"></div>
+          <span id="resultBadgeText">Experienced</span>
+        </div>
+        <div class="result-section-label">Why it works for you</div>
+        <div class="result-why" id="resultWhy">
+          Whole melt is for the concentrate enthusiast who wants the highest terpene complexity and solventless purity, and has a proper rig setup to get the most out of it.
+        </div>
+        <div class="traits" id="resultTraits"></div>
+        <div class="result-cta" id="resultCta">
+          <div class="result-cta-text">
+            <strong id="ctaProductName">Explore at Mood</strong>
+            <span id="ctaProductDetail">Lab-tested. COAs on every product page.</span>
+          </div>
+          <a href="#" class="result-cta-btn" id="ctaLink" target="_top">Shop at Mood →</a>
+        </div>
+        <button class="btn-restart" id="btnRestart">← Start over</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /widget -->
+
+<!-- Footer brand mark -->
+<div class="widget-foot">
+  <a href="https://mood.com" target="_top">Powered by mood.com</a>
+</div>
+
+<script>
+  /* ─────────────────────────────────────────────────────────
+     DATA — Concentrate result definitions
+     Source: static fallback table in article
+     All copy reviewed against Mood terminology rules
+  ───────────────────────────────────────────────────────── */
+  const RESULTS = {
+
+    /* ── Whole Melt / Full Melt Hash ─────────────────────── */
+    wholeMelt: {
+      name: 'Whole Melt / Full Melt Hash',
+      tagline: 'The purest solventless concentrate — 5–6 star trichome quality, zero residue, full flavor.',
+      badge: 'adv',
+      badgeText: 'Experienced dabbers',
+      why: 'Whole melt is built for the concentrate enthusiast who wants the highest terpene complexity and solventless purity. It rewards a proper dab rig setup and a patient hand — the result is a noticeably richer, cleaner experience than most other formats.',
+      traits: ['Solventless', '5–6 star melt quality', 'Trichome-only', 'Rig required', 'Maximum flavor'],
+      ctaProduct: 'Afghan Hash & Classic Hash at Mood',
+      ctaDetail: 'Lab-tested. COA on every product page.',
+      ctaUrl: 'https://mood.com/shop/product-category/concentrates/hash',
+      ctaLabel: 'Shop Hash →',
+    },
+
+    /* ── Hash Rosin ──────────────────────────────────────── */
+    hashRosin: {
+      name: 'Hash Rosin',
+      tagline: 'Solventless, heat-pressed purity — stable texture, excellent terpene preservation.',
+      badge: 'mid',
+      badgeText: 'Some experience helpful',
+      why: 'Hash rosin is the ideal middle ground: fully solventless and rich in terpenes, but in a stable budder or jam texture that\'s easier to work with than loose hash. A good fit if you have a rig and care about purity but want something more approachable than whole melt.',
+      traits: ['Solventless', 'Heat-pressed', 'Stable texture', 'Rig or dab pen', 'Great terpenes'],
+      ctaProduct: 'Concentrates at Mood',
+      ctaDetail: 'Lab-tested. COA on every product page.',
+      ctaUrl: 'https://mood.com/shop/product-category/concentrates',
+      ctaLabel: 'Shop Concentrates →',
+    },
+
+    /* ── Live Resin ──────────────────────────────────────── */
+    liveResin: {
+      name: 'Live Resin',
+      tagline: 'Made from frozen fresh cannabis — exceptional terpene expression, versatile format.',
+      badge: 'mid',
+      badgeText: 'Some experience helpful',
+      why: 'Live resin captures the plant\'s freshest terpene profile by working with frozen-fresh cannabis. It\'s the go-to for anyone who prioritizes flavor complexity and isn\'t committed to a fully solventless process. Comes in sauce, sugar, or badder textures — all great for dabbing or cart use.',
+      traits: ['Frozen fresh cannabis', 'Exceptional terpenes', 'Sauce / sugar / badder', 'Dab or cart compatible'],
+      ctaProduct: 'Concentrates at Mood',
+      ctaDetail: 'Lab-tested. COA on every product page.',
+      ctaUrl: 'https://mood.com/shop/product-category/concentrates',
+      ctaLabel: 'Shop Concentrates →',
+    },
+
+    /* ── THCa Disposable Vape ────────────────────────────── */
+    disposable: {
+      name: 'THCa Disposable Vape',
+      tagline: 'Concentrate-quality extract in a draw-activated, pocket-sized format — zero setup.',
+      badge: 'easy',
+      badgeText: 'All experience levels',
+      why: 'A THCa disposable vape brings the same quality tier as high-grade extracts into a format that needs no rig, no torch, and no technique. Pre-filled, pre-charged, and ready to use. Ideal for first-timers exploring concentrates, or for anyone who wants concentrate quality on the go.',
+      traits: ['No rig required', 'Pre-filled & pre-charged', 'Draw-activated', 'Portable', 'THCa extract'],
+      ctaProduct: 'THCa Disposable Vapes at Mood',
+      ctaDetail: 'Strain-specific. Lab-tested. Ships direct.',
+      ctaUrl: 'https://mood.com/shop/product-category/vapes',
+      ctaLabel: 'Shop Vapes →',
+    },
+
+    /* ── THCa Diamonds ───────────────────────────────────── */
+    diamonds: {
+      name: 'THCa Diamonds',
+      tagline: 'Crystalline THCa concentrate — the highest-potency dabbing format at Mood.',
+      badge: 'adv',
+      badgeText: 'Experienced dabbers',
+      why: 'THCa Diamonds are for experienced dabbers who want a pure, crystalline concentrate with a clean profile. Often paired with sauce for added terpene richness. Requires a rig and precise temperature control to get the most out of them.',
+      traits: ['Crystalline THCa', 'High purity', 'Rig required', 'Experienced users', 'Precise temp control'],
+      ctaProduct: 'THCa Diamonds at Mood',
+      ctaDetail: 'Lab-tested. COA on every product page.',
+      ctaUrl: 'https://mood.com/product/thca-diamonds',
+      ctaLabel: 'Shop THCa Diamonds →',
+    },
+  };
+
+  /* ─────────────────────────────────────────────────────────
+     DECISION LOGIC
+     Maps answers to a result key.
+
+     answers[0]: 'rig' | 'portable'
+     answers[1]: 'top' | 'nice' | 'open'
+     answers[2]: 'terpenes' | 'convenience' | 'both'
+     answers[3]: 'new' | 'some' | 'experienced'
+  ───────────────────────────────────────────────────────── */
+  function getResult(answers) {
+    const [rig, solvent, priority, exp] = answers;
+
+    // ── Portable path ──────────────────────────────────────
+    if (rig === 'portable') {
+      return RESULTS.disposable;
+    }
+
+    // ── Rig path ───────────────────────────────────────────
+
+    // New to concentrates → ease them in via disposable or hash rosin
+    if (exp === 'new') {
+      if (rig === 'rig' && solvent === 'top') {
+        return RESULTS.hashRosin; // solventless, easier than whole melt
+      }
+      return RESULTS.disposable;
+    }
+
+    // Experienced + top solventless priority + terpene focus = whole melt
+    if (exp === 'experienced' && solvent === 'top' && priority === 'terpenes') {
+      return RESULTS.wholeMelt;
+    }
+
+    // Experienced + top solventless + other priority = hash rosin
+    if (exp === 'experienced' && solvent === 'top') {
+      return RESULTS.hashRosin;
+    }
+
+    // Experienced + open to solvents + terpene focus = live resin
+    if (exp === 'experienced' && (solvent === 'open' || solvent === 'nice') && priority === 'terpenes') {
+      return RESULTS.liveResin;
+    }
+
+    // Experienced + open + balance = diamonds
+    if (exp === 'experienced' && priority === 'both') {
+      return RESULTS.diamonds;
+    }
+
+    // Some experience + solventless priority
+    if (exp === 'some' && solvent === 'top') {
+      return RESULTS.hashRosin;
+    }
+
+    // Some experience + terpene priority, open to solvents = live resin
+    if (exp === 'some' && priority === 'terpenes') {
+      return RESULTS.liveResin;
+    }
+
+    // Some experience + convenience = disposable
+    if (exp === 'some' && priority === 'convenience') {
+      return RESULTS.disposable;
+    }
+
+    // Default fallback: hash rosin — solventless, approachable, versatile
+    return RESULTS.hashRosin;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     STATE
+  ───────────────────────────────────────────────────────── */
+  const TOTAL_QUESTIONS = 4;
+  let currentScreen = 0;
+  let answers = new Array(TOTAL_QUESTIONS).fill(null);
+
+  /* ─────────────────────────────────────────────────────────
+     HELPERS
+  ───────────────────────────────────────────────────────── */
+  function showScreen(index) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(`screen-${index}`).classList.add('active');
+    currentScreen = index;
+
+    // Update progress
+    const isResult = (index === TOTAL_QUESTIONS);
+    document.getElementById('progressWrap').style.display = isResult ? 'none' : 'block';
+
+    if (!isResult) {
+      const pct = Math.round((index / TOTAL_QUESTIONS) * 100);
+      document.getElementById('progressLabel').textContent = `Question ${index + 1} of ${TOTAL_QUESTIONS}`;
+      document.getElementById('progressPct').textContent = `${pct}%`;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+    }
+
+    // Scroll to top of widget (important inside iframes)
+    window.scrollTo(0, 0);
+  }
+
+  function setAnswer(questionIndex, value) {
+    answers[questionIndex] = value;
+
+    // Update option visual state
+    const opts = document.querySelectorAll(`[data-q="${questionIndex}"] .option-btn`);
+    opts.forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.value === value);
+    });
+
+    // Enable next button
+    const nextBtn = document.getElementById(`next-${questionIndex}`);
+    if (nextBtn) nextBtn.classList.add('enabled');
+  }
+
+  function renderResult() {
+    const result = getResult(answers);
+
+    document.getElementById('resultName').textContent = result.name;
+    document.getElementById('resultTagline').textContent = result.tagline;
+    document.getElementById('resultWhy').textContent = result.why;
+
+    // Badge
+    const badge = document.getElementById('resultBadge');
+    badge.className = `result-badge badge-${result.badge}`;
+    badge.querySelector('span').textContent = result.badgeText;
+
+    // Traits
+    const traitsEl = document.getElementById('resultTraits');
+    traitsEl.innerHTML = result.traits
+      .map(t => `<span class="trait-chip">${t}</span>`)
+      .join('');
+
+    // CTA
+    document.getElementById('ctaProductName').textContent = result.ctaProduct;
+    document.getElementById('ctaProductDetail').textContent = result.ctaDetail;
+    document.getElementById('ctaLink').href = result.ctaUrl;
+    document.getElementById('ctaLink').textContent = result.ctaLabel;
+
+    showScreen(TOTAL_QUESTIONS);
+  }
+
+  function restart() {
+    answers = new Array(TOTAL_QUESTIONS).fill(null);
+    // Reset all option selections
+    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+    // Disable all next buttons
+    document.querySelectorAll('.btn-next').forEach(btn => btn.classList.remove('enabled'));
+    showScreen(0);
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     EVENT WIRING
+  ───────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // Option button clicks
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const group = this.closest('[data-q]');
+        const qIndex = parseInt(group.dataset.q, 10);
+        setAnswer(qIndex, this.dataset.value);
+      });
+    });
+
+    // Next buttons (Q0–Q2: advance; Q3: show result)
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+      const nextBtn = document.getElementById(`next-${i}`);
+      if (!nextBtn) continue;
+      nextBtn.addEventListener('click', function () {
+        if (!answers[i]) return; // guard: shouldn't happen due to disabled state
+        if (i < TOTAL_QUESTIONS - 1) {
+          showScreen(i + 1);
+        } else {
+          renderResult();
+        }
+      });
+    }
+
+    // Back buttons
+    for (let i = 1; i < TOTAL_QUESTIONS; i++) {
+      const backBtn = document.getElementById(`back-${i}`);
+      if (!backBtn) continue;
+      backBtn.addEventListener('click', function () {
+        showScreen(i - 1);
+      });
+    }
+
+    // Restart
+    document.getElementById('btnRestart').addEventListener('click', restart);
+
+    // Initial progress state
+    showScreen(0);
+  });
+
+  /* ─────────────────────────────────────────────────────────
+     IFRAME HEIGHT COMMUNICATION
+     Sends content height to parent so Shopify can
+     dynamically resize the iframe without scrollbars.
+  ───────────────────────────────────────────────────────── */
+  function sendHeight() {
+    const h = document.getElementById('widget').scrollHeight + 80;
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'moodWidgetHeight', height: h }, '*');
+    }
+  }
+
+  // Send on load and after any screen change
+  window.addEventListener('load', sendHeight);
+
+  // Observe widget size changes
+  if (window.ResizeObserver) {
+    new ResizeObserver(sendHeight).observe(document.getElementById('widget'));
+  }
+</script>
+
+</body>
+</html>
